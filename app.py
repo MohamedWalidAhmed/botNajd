@@ -1,108 +1,66 @@
 import os
 import json
 import openai
+import logging
 from flask import Flask, request, Response, jsonify, render_template
-from twilio.twiml.messaging_response import MessagingResponse # Note: This is for Twilio, will be unused by Meta webhook directly
 from dotenv import load_dotenv
 from datetime import datetime
-import logging # Added for better logging, especially for webhook
+from twilio.twiml.messaging_response import MessagingResponse
+from routes.webhook import webhook_bp
 
-# --- Start of WhatsApp Cloud API Webhook Integration (Meta) ---
-# Configure basic logging
+# --- Start of App Setup ---
+app = Flask(__name__)
+app.register_blueprint(webhook_bp)
+
+# --- Configure Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-VERIFY_TOKEN = "N@jj@9ent2030" # Your Meta App Verify Token
-
-app = Flask(__name__) # Initialize Flask App (moved here as it's needed before routes)
-
-@app.route("/webhook", methods=['GET', 'POST'])
-def webhook_whatsapp_meta():
-    if request.method == 'GET':
-        # Webhook verification logic for WhatsApp Cloud API (Meta)
-        if request.args.get("hub.mode") == "subscribe" and \
-           request.args.get("hub.verify_token") == VERIFY_TOKEN:
-            logging.info("WhatsApp Cloud API Webhook verification successful.")
-            return request.args.get("hub.challenge"), 200
-        else:
-            logging.error(f"WhatsApp Cloud API Webhook verification failed. Token received: {request.args.get('hub.verify_token')}")
-            return "Verification token mismatch or mode is not 'subscribe'", 403
-    elif request.method == 'POST':
-        # This is where you will process incoming messages from Meta
-        data = request.get_json()
-        logging.info(f"Received WhatsApp event from Meta: {json.dumps(data, indent=2)}")
-
-        # TODO: Extract message text and sender ID from 'data'
-        # Example (structure might vary based on actual payload):
-        # if data.get("object") == "whatsapp_business_account":
-        #     if data.get("entry") and data["entry"][0].get("changes") and \
-        #        data["entry"][0]["changes"][0].get("value") and \
-        #        data["entry"][0]["changes"][0]["value"].get("messages"):
-        #
-        #         message_object = data["entry"][0]["changes"][0]["value"]["messages"][0]
-        #         if message_object.get("type") == "text":
-        #             incoming_msg = message_object["text"]["body"]
-        #             sender_wa_id = message_object["from"] # WhatsApp ID (phone number)
-        #
-        #             # Clean sender ID if needed (e.g. for conversation history key)
-        #             sender_clean = sender_wa_id
-        #
-        #             print(f"--- Meta WhatsApp Request from {sender_wa_id} ---")
-        #             # Process with your existing OpenAI logic
-        #             # ai_reply_text, booking_data_extracted = get_openai_reply_and_extract_booking_info(incoming_msg, sender_clean)
-        #             # final_reply_to_user = ai_reply_text
-        #
-        #             # if booking_data_extracted:
-        #             #     # ... (your booking logic) ...
-        #
-        #             # TODO: Send reply back using Meta Graph API (not Twilio TwiML)
-        #             # For example:
-        #             # send_meta_whatsapp_message(sender_wa_id, final_reply_to_user)
-        #             # print(f"Preparing to send Meta reply to {sender_wa_id}: {final_reply_to_user[:100]}...")
-        #
-        #             pass # Placeholder for actual processing and reply
-
-        return jsonify({"status": "success"}), 200 # Acknowledge receipt to Meta
-# --- End of WhatsApp Cloud API Webhook Integration (Meta) ---
-
-# --- 1. Load Environment Variables ---
+# --- Load Environment Variables ---
 try:
     load_dotenv()
-    logging.info("Environment variables loaded from .env file.") # Changed print to logging
-except ImportError:
-    logging.warning("Warning: python-dotenv library is not installed. .env file will not be loaded.") # Changed print to logging
-except FileNotFoundError:
-    logging.info("Warning: .env file not found.") # Changed print to logging
+    logging.info("✅ Environment variables loaded successfully.")
+except Exception as e:
+    logging.warning(f"⚠️ Failed to load .env file: {e}")
 
+# --- End of App Setup ---
+
+# --- OpenAI Setup ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
-    logging.critical("!!! CRITICAL WARNING: OPENAI_API_KEY not found in environment variables. !!!") # Changed print to logging
+    logging.critical("!!! CRITICAL WARNING: OPENAI_API_KEY not found in environment variables. !!!")
     OPENAI_API_KEY = "YOUR_FALLBACK_OPENAI_KEY_IF_NO_ENV"
 
 client = None
 if OPENAI_API_KEY and OPENAI_API_KEY != "YOUR_FALLBACK_OPENAI_KEY_IF_NO_ENV":
     try:
         client = openai.OpenAI(api_key=OPENAI_API_KEY)
-        logging.info("OpenAI client initialized successfully.") # Changed print to logging
+        logging.info("OpenAI client initialized successfully.")
     except Exception as e:
-        logging.critical(f"!!! CRITICAL ERROR initializing OpenAI client: {e} !!!") # Changed print to logging
+        logging.critical(f"!!! CRITICAL ERROR initializing OpenAI client: {e} !!!")
 else:
-    logging.warning("!!! OpenAI client NOT initialized due to missing or placeholder API key. !!!") # Changed print to logging
+    logging.warning("!!! OpenAI client NOT initialized due to missing or placeholder API key. !!!")
 
-# --- 2. Define Paths for External Config Files ---
+# --- Config Paths ---
 CONFIG_DATA_FOLDER = "config_data"
 SYSTEM_PROMPT_FILE_PATH = os.path.join(CONFIG_DATA_FOLDER, "system_prompt.txt")
 REFERENCE_FILE_PATH = os.path.join(CONFIG_DATA_FOLDER, "reference_data.txt")
 REPLIES_FILE_PATH = os.path.join(CONFIG_DATA_FOLDER, "replies.json")
 
-# --- 3. Load SYSTEM_PROMPT, REFERENCE, and REPLIES ---
+# --- Load SYSTEM_PROMPT, REFERENCE, and REPLIES ---
 SYSTEM_PROMPT = ""
 try:
-    if not os.path.exists(SYSTEM_PROMPT_FILE_PATH): logging.error(f"!!! ERROR: System prompt file '{SYSTEM_PROMPT_FILE_PATH}' not found. Using empty prompt. !!!") # Changed print to logging
+    if not os.path.exists(SYSTEM_PROMPT_FILE_PATH):
+        logging.error(f"!!! ERROR: System prompt file '{SYSTEM_PROMPT_FILE_PATH}' not found. Using empty prompt. !!!")
     else:
-        with open(SYSTEM_PROMPT_FILE_PATH, "r", encoding="utf-8") as f: SYSTEM_PROMPT = f.read().strip()
-        if SYSTEM_PROMPT: logging.info(f"System prompt loaded from: '{SYSTEM_PROMPT_FILE_PATH}'") # Changed print to logging
-        else: logging.warning(f"!!! WARNING: System prompt file '{SYSTEM_PROMPT_FILE_PATH}' is empty. !!!") # Changed print to logging
-except Exception as e: logging.error(f"!!! ERROR reading system prompt: {e} !!!") # Changed print to logging
+        with open(SYSTEM_PROMPT_FILE_PATH, "r", encoding="utf-8") as f:
+            SYSTEM_PROMPT = f.read().strip()
+        if SYSTEM_PROMPT:
+            logging.info(f"System prompt loaded from: '{SYSTEM_PROMPT_FILE_PATH}'")
+        else:
+            logging.warning(f"!!! WARNING: System prompt file '{SYSTEM_PROMPT_FILE_PATH}' is empty. !!!")
+except Exception as e:
+    logging.error(f"!!! ERROR reading system prompt: {e} !!!")
+
 
 REFERENCE = ""
 try:
