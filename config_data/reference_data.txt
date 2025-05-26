@@ -1,32 +1,62 @@
-📁 مرجعية مستوصف عيادة نجد (يعمل 24/7):
+## About NajdAIgent ##
+Mission: NajdAIgent is dedicated to empowering businesses and organizations in Saudi Arabia and the region with transformative Artificial Intelligence solutions, contributing directly to the goals of Vision 2030 by fostering innovation, efficiency, and digital transformation.
+Vision: To be the leading AI partner in the MENA region, recognized for cutting-edge solutions, ethical practices, and a commitment to national technological advancement.
+Core Values: Innovation, Excellence, Integrity, Collaboration, Client-Centricity.
+Founded: [سنة التأسيس، لو حابب تضيفها]
+Headquarters: Riyadh, Saudi Arabia.
 
-🏥 الأقسام الطبية:
-الباطنة، الأطفال، النساء والولادة، الجلدية، الأسنان، الأنف والأذن والحنجرة، العيون، العظام، القلب، الجهاز الهضمي، المسالك البولية، الطب العام، الأعصاب، التحاليل الطبية، التطعيمات.
-* لكل تخصص عدة أطباء يعملون بنظام الشفتات لتغطية 24 ساعة.
+## Our AI Services Overview ##
+NajdAIgent offers a comprehensive suite of AI-powered solutions tailored to meet diverse business needs:
 
-👨‍⚕️ أمثلة على أطباء ومواعيد (للاستدلال العام على التوفر):
-- الباطنة: د. أحمد (صباحي/مسائي)، د. ناصر (مسائي/ليلي)، د. ريم (ليلي)
-- الأطفال: د. سارة (نهاري)، د. فيصل (مسائي)، د. أمل (ليلي)
-- الجلدية: د. عبدالعزيز (نهاري/مسائي)، د. مها (مسائي)، د. يزن (ليلي)
-- الأسنان: د. محمد (صباحي/نهاري)، د. سمية (مسائي)، د. طلال (ليلي)
-(يمكنك إضافة المزيد من التفاصيل إذا أردت أن يكون البوت أكثر تحديدًا في اقتراح الدكاترة)
+1.  **Custom AI Chatbot Development:**
+    *   Description: We design and build intelligent, multilingual chatbots for customer service, internal support, lead generation, and process automation.
+    *   Platforms: WhatsApp, Web, Mobile Apps, internal systems.
+    *   Features: Natural Language Understanding (NLU), FAQ automation, OpenAI integration, CRM integration, analytics.
+    *   Example Use Case: Automated 24/7 customer support reducing response times and improving satisfaction.
 
-💰 متوسط الأسعار:
-- كشف (باطنة/أطفال/جلدية/أسنان): 150 ريال
-- استشارة واتساب (إذا متوفرة): 50 ريال
-- تحاليل شاملة: تبدأ من 250 ريال
-- تطعيمات أطفال: 100-250 ريال
+2.  **AI-Powered Data Analytics & Business Intelligence:**
+    *   Description: We help businesses unlock insights from their data using advanced machine learning models for predictive analytics, trend analysis, and data-driven decision-making.
+    *   Techniques: Predictive modeling, anomaly detection, sentiment analysis, customer segmentation.
+    *   Example Use Case: Optimizing marketing spend by identifying high-value customer segments.
 
-📞 معلومات التواصل:
-- الرقم الموحد للحجز والاستفسار: 9200XXXXX
-- تأكيد الحجوزات النهائية يتم عبر فريق الاستقبال.
+3.  **Machine Learning Model Deployment & MLOps:**
+    *   Description: We assist in deploying, managing, and scaling machine learning models in production environments, ensuring reliability and continuous improvement.
+    *   Focus: Scalability, monitoring, CI/CD for ML.
+    *   Example Use Case: Deploying a fraud detection model for a financial institution.
 
-📌 خدمات إضافية:
-حجز مواعيد مسبقة، طوارئ 24 ساعة، تقارير طبية إلكترونية، إرسال نتائج التحاليل عبر الواتساب، تذكير آلي بالمواعيد.
+4.  **AI Strategy & Consultation:**
+    *   Description: Our experts work with organizations to develop tailored AI strategies, identify high-impact use cases, and create roadmaps for AI adoption.
+    *   Process: Assessment, ideation workshops, feasibility studies, ROI analysis.
+    *   Example Use Case: Helping a retail company develop a strategy for using AI to personalize customer experiences.
 
-📋 تنبيهات هامة للعملاء:
-- يرجى الوصول قبل الموعد بـ 10 دقائق.
-- يمكن تعديل أو إلغاء الموعد قبل 6 ساعات من وقته.
-- في حال عدم توفر الموعد المطلوب تمامًا، سيتم اقتراح أقرب موعد بديل ومناسب.
+## Our Approach to AI Projects ##
+*   Discovery & Assessment: Understanding client needs and existing infrastructure.
+*   Solution Design: Architecting a tailored AI solution.
+*   Development & Implementation: Agile development methodologies.
+*   Testing & QA: Rigorous testing for performance and accuracy.
+*   Deployment & Integration: Seamless integration with client systems.
+*   Support & Maintenance: Ongoing support and model retraining.
 
-🎯 استخدم هذه المعلومات فقط للرد على استفسارات العملاء وطلبات الحجز.
+## Technology & Expertise ##
+*   We leverage state-of-the-art NLP models, computer vision frameworks, and cloud AI platforms.
+*   Our team comprises experienced data scientists, AI engineers, and domain experts.
+*   We are proficient in Python, TensorFlow, PyTorch, and other leading AI tools and libraries.
+
+## Aligning with Vision 2030 ##
+NajdAIgent actively contributes to Saudi Arabia's Vision 2030 by:
+*   Enhancing digital infrastructure through AI adoption.
+*   Developing local AI talent and expertise.
+*   Driving economic diversification by enabling new AI-powered industries and services.
+*   Improving efficiency and productivity across various sectors.
+
+## Requesting a Consultation ##
+To discuss your specific AI needs and how NajdAIgent can assist you, please:
+*   Visit our website: [موقعكم الإلكتروني]
+*   Email us at: [البريد الإلكتروني للمبيعات أو الاستشارات]
+*   Or simply ask me (NajdAIgent bot) to "request a consultation" and I can guide you.
+
+## Contact Information (General) ##
+*   Website: [موقعكم الإلكتروني]
+*   General Inquiries Email: [البريد الإلكتروني للاستفسارات العامة]
+*   Phone (if applicable): [رقم الهاتف العام]
+*   (Note: Working hours and physical address are usually in the FAQ, but can be here for completeness if desired by AI)
