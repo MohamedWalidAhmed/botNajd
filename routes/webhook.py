@@ -110,13 +110,15 @@ def webhook_handler():
                     elif onboarding_step == "awaiting_language_selection":
                         if msg_body == "1" or "english" in msg_body.lower():
                             current_lang = "en"
-                            store_user_info(from_user_id, {"language": current_lang, "onboarding_step": "awaiting_name"})
+                            store_user_info(from_user_id, "language", current_lang)  # خزن اللغة لوحدها
+                            store_user_info(from_user_id, "onboarding_step", "awaiting_name") # خزن الخطوة الجديدة لوحدها
                             confirm_lang_text = get_reply_from_json("language_selected_en", current_lang)
                             ask_name_text = get_reply_from_json("ask_name", current_lang)
                             reply_text_direct = f"{confirm_lang_text}\n\n{ask_name_text}"
                         elif msg_body == "2" or "عربية" in msg_body or "arabic" in msg_body.lower():
                             current_lang = "ar"
-                            store_user_info(from_user_id, {"language": current_lang, "onboarding_step": "awaiting_name"})
+                            store_user_info(from_user_id, "language", current_lang)  # خزن اللغة لوحدها
+                            store_user_info(from_user_id, "onboarding_step", "awaiting_name") # خزن الخطوة الجديدة لوحدها
                             confirm_lang_text = get_reply_from_json("language_selected_ar", current_lang)
                             ask_name_text = get_reply_from_json("ask_name", current_lang)
                             reply_text_direct = f"{confirm_lang_text}\n\n{ask_name_text}"
@@ -128,14 +130,16 @@ def webhook_handler():
                     
                     elif onboarding_step == "awaiting_name":
                         user_name = msg_body.strip()
-                        store_user_info(from_user_id, {"name": user_name, "onboarding_step": "awaiting_service_interest"})
+                        store_user_info(from_user_id, "name", user_name) # خزن الاسم لوحده
+                        store_user_info(from_user_id, "onboarding_step", "awaiting_service_interest") # خزن الخطوة الجديدة لوحدها
                         current_lang = get_user_language(from_user_id) # تأكد من استخدام اللغة المخزنة
                         reply_message_key = "ask_service_interest"
                         reply_kwargs = {"name": user_name}
                     
                     elif onboarding_step == "awaiting_service_interest":
                         service_interest = msg_body.strip()
-                        store_user_info(from_user_id, {"service_interest": service_interest, "onboarding_step": "completed"})
+                        store_user_info(from_user_id, "service_interest", service_interest) # خزن الاهتمام لوحده
+                        store_user_info(from_user_id, "onboarding_step", "completed") # خزن إن الـ onboarding خلص
                         current_lang = get_user_language(from_user_id)
                         user_name = get_user_info(from_user_id).get("name", get_reply_from_json("default_username", current_lang)) # اسم افتراضي مترجم
                         reply_message_key = "onboarding_complete"
