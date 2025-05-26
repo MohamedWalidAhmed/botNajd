@@ -1,0 +1,32 @@
+{
+  "working_hours": {
+    "keywords_en": ["working hours", "hours of operation", "open", "business hours"],
+    "keywords_ar": ["ساعات العمل", "اوقات الدوام", "متى تفتحون", "دوام"],
+    "answer_en": "Our official working hours are from Sunday to Thursday, 9:00 AM to 6:00 PM (GMT+3). We're here to assist you! 🕒",
+    "answer_ar": "ساعات عملنا الرسمية من الأحد إلى الخميس، من الساعة 9:00 صباحًا حتى 6:00 مساءً (بتوقيت جرينتش+3). نحن هنا لمساعدتك! 🕒"
+  },
+  "address": {
+    "keywords_en": ["address", "location", "where are you", "office location"],
+    "keywords_ar": ["عنوان", "موقع", "اين انتم", "موقع المكتب"],
+    "answer_en": "You can find NajdAIgent headquarters at [أدخل عنوانك هنا], Riyadh, Saudi Arabia. We look forward to innovating with you! 📍",
+    "answer_ar": "يمكنك إيجاد المقر الرئيسي لشركة نجد ايجنت في [أدخل عنوانك هنا]، الرياض، المملكة العربية السعودية. نتطلع للابتكار معكم! 📍"
+  },
+  "services": {
+    "keywords_en": ["services", "what do you offer", "solutions", "products"],
+    "keywords_ar": ["خدمات", "ماذا تقدمون", "حلول", "منتجات"],
+    "answer_en": "NajdAIgent offers a suite of cutting-edge AI solutions including [مثال: AI-powered analytics, custom chatbot development, machine learning model deployment, and AI strategy consulting]. How can we tailor our AI expertise to your needs? 🚀",
+    "answer_ar": "تقدم نجد ايجنت مجموعة من حلول الذكاء الاصطناعي المتطورة تشمل [مثال: تحليلات مدعومة بالذكاء الاصطناعي، تطوير روبوتات محادثة مخصصة، نشر نماذج تعلم الآلة، واستشارات استراتيجية للذكاء الاصطناعي]. كيف يمكننا تكييف خبرتنا في الذكاء الاصطناعي لتلبية احتياجاتك؟ 🚀"
+  },
+  "prices": {
+    "keywords_en": ["price", "cost", "pricing", "how much", "packages"],
+    "keywords_ar": ["سعر", "تكلفة", "اسعار", "بكم", "باقات"],
+    "answer_en": "Our pricing is tailored to the specific solution and scale of your project. For a detailed quote, please request a consultation, and our team will be happy to assist you. 💼",
+    "answer_ar": "تعتمد أسعارنا على الحل المحدد وحجم مشروعك. للحصول على عرض أسعار مفصل، يرجى طلب استشارة، وسيكون فريقنا سعيدًا بمساعدتك. 💼"
+  },
+  "request_consultation": {
+    "keywords_en": ["consultation", "request a meeting", "talk to sales", "demo"],
+    "keywords_ar": ["استشارة", "طلب اجتماع", "اتكلم مع المبيعات", "عرض تجريبي"],
+    "answer_en": "To request a consultation with our AI experts, please visit our website at [رابط صفحة طلب الاستشارة] or reply with 'Consultation Request' and your contact details. We're eager to discuss your vision! 💡",
+    "answer_ar": "لطلب استشارة مع خبراء الذكاء الاصطناعي لدينا، يرجى زيارة موقعنا الإلكتروني [رابط صفحة طلب الاستشارة] أو قم بالرد بـ 'طلب استشارة' مع تفاصيل الاتصال الخاصة بك. نتوق لمناقشة رؤيتك! 💡"
+  }
+}
