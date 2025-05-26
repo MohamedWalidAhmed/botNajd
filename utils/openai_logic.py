@@ -1,82 +1,76 @@
-# utils/openai_logic.py
-
-import os
-import logging
-from datetime import datetime
-from dotenv import load_dotenv
 import openai
-from utils.helpers import load_conversation_history, save_conversation_history, add_to_conversation_history
-from utils.helpers import load_customer_data, update_customer_name
+import os
+# from .helpers import load_conversation_history, add_to_conversation_history # If managed here
 
-load_dotenv()
+# Ensure API key is set (preferably as an environment variable)
+# openai.api_key = os.getenv("OPENAI_API_KEY")
+# if not openai.api_key:
+#    print("Critical: OPENAI_API_KEY environment variable not set.")
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-SYSTEM_PROMPT_FILE_PATH = "config_data/system_prompt.txt"
-REFERENCE_FILE_PATH = "config_data/reference_data.txt"
-
-SYSTEM_PROMPT = ""
-REFERENCE = ""
-
-try:
-    with open(SYSTEM_PROMPT_FILE_PATH, "r", encoding="utf-8") as f:
-        SYSTEM_PROMPT = f.read().strip()
-    with open(REFERENCE_FILE_PATH, "r", encoding="utf-8") as f:
-        REFERENCE = f.read().strip()
-except Exception as e:
-    logging.error(f"Error loading prompt or reference: {e}")
-
-client = None
-if OPENAI_API_KEY:
+# Assuming you have these files or similar content for context
+def get_system_prompt_content() -> str:
     try:
-        client = openai.OpenAI(api_key=OPENAI_API_KEY)
-    except Exception as e:
-        logging.error(f"Error initializing OpenAI: {e}")
+        with open(os.path.join("config_data", "system_prompt.txt"), 'r', encoding='utf-8') as f:
+            # Added NajdAIgent identity to system prompt
+            base_prompt = f.read().strip()
+            return f"{base_prompt} You are NajdAIgent, a helpful, professional, and confident AI assistant from a Saudi AI company aligned with Vision 2030. Respond in a polished and structured manner."
+    except FileNotFoundError:
+        return "You are NajdAIgent, a helpful, professional, and confident AI assistant from a Saudi AI company aligned with Vision 2030. Respond in a polished and structured manner."
 
+def get_reference_data_content() -> str:
+    try:
+        with open(os.path.join("config_data", "reference_data.txt"), 'r', encoding='utf-8') as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return ""
 
-def get_openai_reply_and_extract_booking_info(user_msg, sender_number_clean):
-    user_msg_lower = user_msg.lower()
-    if not client:
-        return "عذرًا، لا يمكن الوصول إلى الذكاء الاصطناعي الآن.", None
+def generate_openai_response(user_id: str, user_message: str, lang: str, conversation_history: list) -> str:
+    """
+    Generates a response using OpenAI API, incorporating conversation history and language.
+    The decision to call this (i.e., no static FAQ match) is made in webhook.py.
+    """
+    if not os.getenv("OPENAI_API_KEY"):
+        print("Error: OPENAI_API_KEY not configured.")
+        return "I am currently unable to process this request due to a configuration issue." if lang == "en" else "أنا غير قادر حاليًا على معالجة هذا الطلب بسبب مشكلة في الإعدادات."
 
-    known_customer_name = None
-    customer_profile = load_customer_data().get(sender_number_clean)
-    if customer_profile:
-        known_customer_name = customer_profile.get("name")
+    openai.api_key = os.getenv("OPENAI_API_KEY") # Ensure it's set for each call or globally
 
-    effective_prompt = SYSTEM_PROMPT
-    if known_customer_name:
-        effective_prompt = f"العميل: {known_customer_name}\n{SYSTEM_PROMPT}"
+    system_prompt = get_system_prompt_content()
+    if lang == "ar":
+        system_prompt += " Please respond in Arabic."
+    else:
+        system_prompt += " Please respond in English."
 
-    now = datetime.now()
-    hour = now.hour
-    shift = "الصباحي" if hour < 16 else "المسائي" if hour < 24 else "الليلي"
+    messages = [{"role": "system", "content": system_prompt}]
+    
+    reference_text = get_reference_data_content()
+    if reference_text:
+        messages.append({"role": "system", "content": f"Reference Information: {reference_text}"})
 
-    messages = [
-        {"role": "system", "content": f"{effective_prompt}\nالوقت الحالي: {hour}:00 - الشفت: {shift}\n\n{REFERENCE}"},
-        *load_conversation_history(sender_number_clean),
-        {"role": "user", "content": user_msg}
-    ]
+    # Add existing conversation history (already loaded and passed from webhook.py)
+    for entry in conversation_history:
+        messages.append(entry)
+    
+    # Add the current user message
+    messages.append({"role": "user", "content": user_message})
 
     try:
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = openai.ChatCompletion.create(
+            model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"), # Use your preferred model
             messages=messages,
-            temperature=0.5,
-            max_tokens=450
+            temperature=0.7, # Adjust as needed
+            max_tokens=300   # Adjust as needed
         )
-        reply = completion.choices[0].message.content.strip()
-        add_to_conversation_history(sender_number_clean, "user", user_msg)
-        add_to_conversation_history(sender_number_clean, "assistant", reply)
-
-        if "##بيانات_الحجز##" in reply:
-            extracted_info = {}
-            for line in reply.split("##بيانات_الحجز##")[-1].split("\n"):
-                if ":" in line:
-                    key, val = line.split(":", 1)
-                    extracted_info[key.strip()] = val.strip()
-            return reply, extracted_info
-
-        return reply, None
+        ai_response = response.choices[0].message.content.strip()
+    except openai.error.OpenAIError as e:
+        print(f"OpenAI API Error for user {user_id}: {e}")
+        ai_response = "I encountered an issue while trying to generate a response. Please try again."
+        if lang == "ar":
+            ai_response = "واجهت مشكلة أثناء محاولة إنشاء رد. يرجى المحاولة مرة أخرى."
     except Exception as e:
-        logging.error(f"OpenAI Error: {e}")
-        return "عذرًا، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.", None
+        print(f"An unexpected error occurred in generate_openai_response for user {user_id}: {e}")
+        ai_response = "An unexpected error occurred. Our team has been notified."
+        if lang == "ar":
+            ai_response = "حدث خطأ غير متوقع. تم إخطار فريقنا."
+            
+    return ai_response
