@@ -4,6 +4,8 @@ import os
 from typing import Dict, Any, Optional, List
 from thefuzz import fuzz
 import logging # <--- ضيف دي لو مش موجودة
+print("=== DEBUG: helpers.py LOADED ===")
+
 
 # --- إعداد الـ Logger (مهم!) ---
 # لو انت عامل إعدادات logging في app.py والـ logger بتاع الـ app متاح هنا، استخدمه
@@ -165,6 +167,7 @@ def get_user_language(phone_number: str) -> str:
     """
     user_data = get_user_info(phone_number)
     return user_data.get("language", "en")
+
 
 
 
