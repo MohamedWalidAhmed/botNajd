@@ -139,5 +139,25 @@ def add_to_conversation_history(user_id: str, role: str, content: str, max_histo
     save_conversation_history(user_id, history_data)
     logger.info(f"HELPERS.PY: Conversation history for {user_id} updated. New length: {len(history_data)}")
 
+
+
+def get_reply_from_json(reply_key: str, lang: str, **kwargs) -> str:
+    """
+    Fetches a reply from replies.json based on key and language.
+    kwargs are used for formatting placeholders in the reply string.
+    """
+    replies_content = _load_json_data(REPLIES_FILE)
+    message_template = replies_content.get(reply_key, {}).get(lang)
+    if not message_template:
+        # Fallback to English if specific language or key is missing
+        message_template = replies_content.get(reply_key, {}).get("en", f"Error: Reply key '{reply_key}' not found for lang '{lang}'.")
+        logger.warning(f"HELPERS.PY: Reply key '{reply_key}' not found for lang '{lang}'. Fallback to EN or error msg.")
+    try:
+        return message_template.format(**kwargs)
+    except KeyError as e:
+        logger.warning(f"HELPERS.PY: Missing placeholder {e} for reply key '{reply_key}' (lang: {lang}).")
+        return message_template  # Return unformatted if placeholder is missing
+
+
 # باقي الدوال في helpers.py (get_reply_from_json, get_static_reply, get_user_language) مش محتاجة تعديل كبير في اللوجات للتشخيص ده
 # بس اتأكد إن get_user_language بتستخدم get_user_info اللي باللوجات الجديدة.
