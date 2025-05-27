@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify, current_app
 import os
 import json
 import logging # مهم يبقى موجود حتى لو هنعتمد على current_app.logger أحياناً
+from utils.helpers import add_to_conversation_history, get_reply_from_json
+
 
 # ---------------------------------------------------------------------------- #
 #             🛑▶️▶️▶️ تعديل هام: استيراد دالة الإرسال الحقيقية ◀️◀️◀️🛑             #
