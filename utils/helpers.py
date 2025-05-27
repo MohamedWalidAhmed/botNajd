@@ -159,5 +159,6 @@ def get_reply_from_json(reply_key: str, lang: str, **kwargs) -> str:
         return message_template  # Return unformatted if placeholder is missing
 
 
+
 # باقي الدوال في helpers.py (get_reply_from_json, get_static_reply, get_user_language) مش محتاجة تعديل كبير في اللوجات للتشخيص ده
 # بس اتأكد إن get_user_language بتستخدم get_user_info اللي باللوجات الجديدة.
