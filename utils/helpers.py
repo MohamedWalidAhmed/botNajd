@@ -159,6 +159,15 @@ def get_reply_from_json(reply_key: str, lang: str, **kwargs) -> str:
         return message_template  # Return unformatted if placeholder is missing
 
 
+def get_user_language(phone_number: str) -> str:
+    """
+    Retrieves the user's preferred language. Defaults to 'en' if not set.
+    """
+    user_data = get_user_info(phone_number)
+    return user_data.get("language", "en")
+
+
+
 
 # باقي الدوال في helpers.py (get_reply_from_json, get_static_reply, get_user_language) مش محتاجة تعديل كبير في اللوجات للتشخيص ده
 # بس اتأكد إن get_user_language بتستخدم get_user_info اللي باللوجات الجديدة.
