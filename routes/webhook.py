@@ -2,7 +2,11 @@ from flask import Blueprint, request, jsonify, current_app
 import os
 import json
 import logging # مهم يبقى موجود حتى لو هنعتمد على current_app.logger أحياناً
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.helpers import add_to_conversation_history, get_reply_from_json
+print("DEBUG: import done for add_to_conversation_history")
 
 
 # ---------------------------------------------------------------------------- #
