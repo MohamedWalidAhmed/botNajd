@@ -168,6 +168,33 @@ def get_user_language(phone_number: str) -> str:
     user_data = get_user_info(phone_number)
     return user_data.get("language", "en")
 
+def get_static_reply(user_message: str, lang: str, threshold: int = 75) -> Optional[str]:
+    """
+    Checks user message against FAQ keywords using fuzzy matching.
+    Returns the answer if a match is found above the threshold, otherwise None.
+    """
+    faq_content = _load_json_data(FAQ_DATA_FILE)
+    user_message_lower = user_message.lower().strip()
+
+    best_match_score = 0
+    best_answer = None
+
+    for _, faq_item in faq_content.items():
+        keywords_key = f"keywords_{lang}"
+        answer_key = f"answer_{lang}"
+
+        if keywords_key not in faq_item or answer_key not in faq_item:
+            continue
+
+        keywords: List[str] = faq_item[keywords_key]
+        
+        for keyword in keywords:
+            similarity_score = fuzz.token_set_ratio(user_message_lower, keyword.lower())
+            if similarity_score >= threshold and similarity_score > best_match_score:
+                best_match_score = similarity_score
+                best_answer = faq_item[answer_key]
+                
+    return best_answer
 
 
 
