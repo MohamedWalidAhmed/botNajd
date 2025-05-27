@@ -1,30 +1,36 @@
 from flask import Flask
 import os
-from dotenv import load_dotenv # لملف .env
+from dotenv import load_dotenv
 
-# استيراد الـ Blueprint من ملف الويب هوك
-from routes.webhook import webhook_bp # <--- هنا الـ import المهم
+# استيراد Blueprint للويب هوك (تأكد أن المسار صحيح في مشروعك)
+from routes.webhook import webhook_bp
 
-# تحميل متغيرات البيئة من .env (مهم للتطوير المحلي)
+# تحميل متغيرات البيئة من .env (مطلوب للتطوير المحلي/الإنتاج)
 load_dotenv()
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
 
-# إعدادات الـ App (لو عندك أي config خاص ممكن تضيفه هنا)
-# app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'a_very_secret_key')
+    # إعدادات التطبيق الإضافية (ضع أي إعدادات إضافية هنا)
+    # app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your_secret_key')
 
-# تسجيل الـ Blueprint
-# لو الـ webhook بتاعك المفروض يكون على المسار الرئيسي (مثلاً /webhook)
-app.register_blueprint(webhook_bp)
-# لو عايز الـ webhook يكون تحت مسار معين (مثلاً /api/webhook)
-# app.register_blueprint(webhook_bp, url_prefix='/api')
+    # تسجيل Blueprint الخاص بالويب هوك
+    app.register_blueprint(webhook_bp)
+    # إذا أردت استخدام url_prefix:
+    # app.register_blueprint(webhook_bp, url_prefix='/api')
 
+    # إعداد لوجينج افتراضي لو لم يكن معرف في ملفات أخرى (مفيد في Render/logs)
+    import logging
+    if not app.logger.handlers:
+        logging.basicConfig(level=logging.INFO)
+
+    return app
+
+app = create_app()
 
 if __name__ == "__main__":
-    # تأكد إن الـ debug mode مقفول في الإنتاج على Render
-    # Render بيستخدم الـ PORT environment variable
+    # إعدادات التشغيل المحلي فقط (Render يشغل Gunicorn غالباً تلقائياً)
     port = int(os.getenv("PORT", 5000))
-    # لما تشغل على Render، هو بيستخدم Gunicorn أو ما شابه، فـ app.run() دي بتكون للتطوير المحلي أكتر
-    # بس لو Render بيشغل python app.py مباشرة، يبقى دي هتشتغل.
-    # الأفضل لـ Render هو استخدام Procfile و gunicorn.
-    app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False').lower() == 'true')
+    debug_mode = os.getenv("FLASK_DEBUG", 'False').lower() == 'true'
+    # للتطوير المحلي فقط!
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
