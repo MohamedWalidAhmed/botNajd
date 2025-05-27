@@ -33,25 +33,29 @@ except ImportError as e:
     ACTIVE_MESSAGE_SENDER = mock_send_whatsapp_message
 # --- نهاية استيراد دالة الإرسال ---
 
+# routes/webhook.py
+
+# ... (import بتاع ACTIVE_MESSAGE_SENDER) ...
 
 # --- استيراد الـ helper functions و openai_logic ---
-# هذا المسار يفترض أن app.py في الـ root، و utils و routes فولدرات جواه
-# لو هيكلك مختلف، عدل المسار ده.
 try:
-    from utils.helpers import (
+    from ..utils.helpers import ( # <--- التعديل هنا: ضيفنا نقطتين
         store_user_info, get_user_info, get_user_language,
         get_reply_from_json, get_static_reply,
         add_to_conversation_history, load_conversation_history
     )
-    from utils.openai_logic import generate_openai_response
-    _logger_init.info("Successfully imported helper functions and openai_logic.")
-except ImportError as e:
-    _logger_init.critical(f"CRITICAL IMPORT ERROR: Could not import from 'utils.helpers' or 'utils.openai_logic'. Bot may not function. Error: {e}")
-    # لو الدوال دي مش موجودة، البوت هيضرب. لازم الـ imports دي تنجح.
-    # ممكن نعمل raise لـ Exception هنا عشان الـ app ميشتغلش أصلاً
-    # raise RuntimeError(f"Failed to import critical utils: {e}") from e
-# --- نهاية استيراد الـ helper functions ---
+    from ..utils.openai_logic import generate_openai_response # <--- التعديل هنا: ضيفنا نقطتين
+    
+    _logger_init_helpers = current_app.logger if current_app else logging.getLogger(__name__) # استخدم لوجر آمن
+    _logger_init_helpers.info("Successfully imported helper functions and openai_logic using relative import.")
 
+except ImportError as e:
+    _logger_init_error = current_app.logger if current_app else logging.getLogger(__name__)
+    _logger_init_error.critical(f"CRITICAL RELATIVE IMPORT ERROR: Could not import from '..utils.*'. Bot may not function. Error: {e}")
+    # مهم جداً: لو الـ imports دي فشلت، الـ app مينفعش يشتغل صح.
+    # الأفضل إننا نوقف الـ app هنا عشان المشكلة متكملش.
+    raise RuntimeError(f"Failed to import critical utils (relative import): {e}") from e
+# --- نهاية استيراد الـ helper functions ---
 
 # تعريف الـ Blueprint
 webhook_bp = Blueprint('webhook_bp', __name__)
