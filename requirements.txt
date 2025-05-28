@@ -5,3 +5,4 @@ requests
 twilio
 thefuzz>=0.19.0
 python-Levenshtein>=0.12.2
+pip install sqlalchemy psycopg2-binary
