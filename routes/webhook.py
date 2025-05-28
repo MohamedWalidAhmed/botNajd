@@ -15,15 +15,17 @@ except ImportError:
         logger.info(f"MOCK SEND (Real function not imported) to {to_phone_number}: '{message_text}'")
     ACTIVE_MESSAGE_SENDER = mock_send_whatsapp_message
 
-# --- استيراد الـ helper functions و openai_logic ---
+# --- استيراد الدوال الجديدة من db_helpers و باقي الأدوات --- #
+from utils.db_helpers import (
+    add_or_update_customer,
+    get_customer,
+    add_message,
+    get_conversation,
+)
 from utils.helpers import (
-    store_user_info,
-    get_user_info,
     get_user_language,
     get_reply_from_json,
     get_static_reply,
-    add_to_conversation_history,
-    load_conversation_history,
 )
 from utils.openai_logic import generate_openai_response
 
@@ -31,30 +33,27 @@ from utils.openai_logic import generate_openai_response
 webhook_bp = Blueprint('webhook_bp', __name__)
 VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN", "your_default_verify_token_if_not_set")
 
-
 # --- دالة معالجة الـ onboarding والرد المناسب ---
 def handle_onboarding(phone, msg_body, user_data):
-    onboarding_step = user_data.get("onboarding_step", "awaiting_language")
-    current_lang = user_data.get("language", "en")
+    onboarding_step = user_data.onboarding_step if user_data and user_data.onboarding_step else "awaiting_language"
+    current_lang = user_data.language if user_data and user_data.language else "en"
 
     if onboarding_step == "awaiting_language":
         # إرسال رسالة ترحيب وخيارات اللغة
         reply = get_reply_from_json("welcome_najdaigent", current_lang)
-        store_user_info(phone, "onboarding_step", "awaiting_language_selection")
+        add_or_update_customer(phone, onboarding_step="awaiting_language_selection")
         return reply
 
     elif onboarding_step == "awaiting_language_selection":
         if msg_body == "1" or "english" in msg_body.lower():
             current_lang = "en"
-            store_user_info(phone, "language", current_lang)
-            store_user_info(phone, "onboarding_step", "awaiting_name")
+            add_or_update_customer(phone, language=current_lang, onboarding_step="awaiting_name")
             confirm_lang = get_reply_from_json("language_selected_en", current_lang)
             ask_name = get_reply_from_json("ask_name", current_lang)
             return f"{confirm_lang}\n\n{ask_name}"
         elif msg_body == "2" or "عربية" in msg_body or "arabic" in msg_body.lower():
             current_lang = "ar"
-            store_user_info(phone, "language", current_lang)
-            store_user_info(phone, "onboarding_step", "awaiting_name")
+            add_or_update_customer(phone, language=current_lang, onboarding_step="awaiting_name")
             confirm_lang = get_reply_from_json("language_selected_ar", current_lang)
             ask_name = get_reply_from_json("ask_name", current_lang)
             return f"{confirm_lang}\n\n{ask_name}"
@@ -65,18 +64,17 @@ def handle_onboarding(phone, msg_body, user_data):
 
     elif onboarding_step == "awaiting_name":
         user_name = msg_body.strip()
-        store_user_info(phone, "name", user_name)
-        store_user_info(phone, "onboarding_step", "awaiting_service_interest")
+        add_or_update_customer(phone, name=user_name, onboarding_step="awaiting_service_interest")
         current_lang = get_user_language(phone)
         reply = get_reply_from_json("ask_service_interest", current_lang, name=user_name)
         return reply
 
     elif onboarding_step == "awaiting_service_interest":
         service_interest = msg_body.strip()
-        store_user_info(phone, "service_interest", service_interest)
-        store_user_info(phone, "onboarding_step", "completed")
+        add_or_update_customer(phone, service_interest=service_interest, onboarding_step="completed")
         current_lang = get_user_language(phone)
-        user_name = get_user_info(phone).get("name", get_reply_from_json("default_username", current_lang))
+        user_obj = get_customer(phone)
+        user_name = user_obj.name if user_obj and user_obj.name else get_reply_from_json("default_username", current_lang)
         reply = get_reply_from_json("onboarding_complete", current_lang, name=user_name)
         return reply
 
@@ -124,33 +122,33 @@ def webhook_handler():
                     return jsonify({'status': 'missing_data_in_message'}), 400
 
                 logger.info(f"Processing message from {from_user_id}: '{msg_body}'")
-                add_to_conversation_history(from_user_id, "user", msg_body)
+                add_message(from_user_id, "user", msg_body)
 
-                # استرجاع بيانات العميل
-                user_data = get_user_info(from_user_id)
-                onboarding_step = user_data.get("onboarding_step", "awaiting_language")
+                # استرجاع بيانات العميل من قاعدة البيانات
+                user_data = get_customer(from_user_id)
+                onboarding_step = user_data.onboarding_step if user_data and user_data.onboarding_step else "awaiting_language"
 
                 # إذا العميل في onboarding
                 if onboarding_step != "completed":
                     reply = handle_onboarding(from_user_id, msg_body, user_data)
                     ACTIVE_MESSAGE_SENDER(from_user_id, reply)
-                    add_to_conversation_history(from_user_id, "assistant", reply)
+                    add_message(from_user_id, "assistant", reply)
                     logger.info(f"Onboarding step '{onboarding_step}' processed for user {from_user_id}.")
                     return jsonify({'status': 'onboarding_handled'}), 200
 
                 # -------- التفاعل العادي بعد الـ onboarding -------- #
-                current_lang = get_user_language(from_user_id)
+                current_lang = user_data.language if user_data and user_data.language else "en"
                 static_answer = get_static_reply(msg_body, current_lang)
 
                 if static_answer:
                     reply = static_answer + get_reply_from_json("signature_static", current_lang)
                 else:
-                    conversation_hist = load_conversation_history(from_user_id)
+                    conversation_hist = get_conversation(from_user_id)
                     ai_response = generate_openai_response(from_user_id, msg_body, current_lang, conversation_hist)
                     reply = ai_response + get_reply_from_json("signature_openai", current_lang)
 
                 ACTIVE_MESSAGE_SENDER(from_user_id, reply)
-                add_to_conversation_history(from_user_id, "assistant", reply)
+                add_message(from_user_id, "assistant", reply)
                 logger.info(f"Regular reply sent to user {from_user_id}.")
                 return jsonify({'status': 'reply_sent'}), 200
 
@@ -159,9 +157,9 @@ def webhook_handler():
                 try:
                     error_lang = 'en'
                     if 'from_user_id' in locals() and from_user_id:
-                        user_lang_data = get_user_info(from_user_id)
-                        if user_lang_data and user_lang_data.get("language"):
-                            error_lang = user_lang_data.get("language")
+                        user_lang_data = get_customer(from_user_id)
+                        if user_lang_data and user_lang_data.language:
+                            error_lang = user_lang_data.language
                     error_msg = get_reply_from_json("error_occurred_generic", error_lang)
                     if 'from_user_id' in locals() and from_user_id and error_msg:
                         ACTIVE_MESSAGE_SENDER(from_user_id, error_msg)
