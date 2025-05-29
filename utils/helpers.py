@@ -1,15 +1,15 @@
 import os
 import json
-from typing import Dict, Any, Optional, List
+from typing import Optional
 from thefuzz import fuzz
 import logging
 
-# --- إعداد الـ Logger ---
+# إعداد الـ Logger
 logger = logging.getLogger(__name__)
 if not logger.handlers:
     logger.setLevel(logging.INFO)
 
-# كشف بسيط حسب كلمات البداية (ممكن تطوره فيما بعد)
+# كشف اللغة (بسيط)
 def detect_language(text):
     if any(word in text for word in ['السلام', 'عليكم', 'مرحبا', 'اهلاً', 'أهلاً', 'عربي']):
         return "ar"
@@ -18,37 +18,47 @@ def detect_language(text):
     else:
         return "ar"  # الديفولت عربي
 
-# --- تحديد المسارات (للملفات الثابتة فقط مثل replies, faq) ---
+# مسارات الملفات
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DATA_PATH = os.path.join(BASE_DIR, "config_data")
 REPLIES_FILE = os.path.join(CONFIG_DATA_PATH, "replies.json")
 FAQ_DATA_FILE = os.path.join(CONFIG_DATA_PATH, "faq_data.json")
 
-# --- دوال تحميل JSON للردود والـ FAQ فقط ---
+# تحميل JSON لأي ملف
 def _load_json_data(file_path: str):
     try:
         if not os.path.exists(file_path):
+            logger.warning(f"File not found: {file_path}")
             return {}
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
             if not content.strip():
+                logger.warning(f"File is empty: {file_path}")
                 return {}
             return json.loads(content)
     except Exception as e:
         logger.error(f"Error loading JSON from {file_path}: {e}", exc_info=True)
         return {}
 
-# --- الردود الجاهزة والـ FAQ ---
-def get_reply_from_json(reply_key: str, lang: str, **kwargs) -> str:
+# جلب الرد من replies.json
+def get_reply_from_json(reply_key: str, lang: str = "ar", **kwargs) -> str:
     replies_content = _load_json_data(REPLIES_FILE)
-    message_template = replies_content.get(reply_key, {}).get(lang)
+    key_obj = replies_content.get(reply_key)
+    if not key_obj:
+        logger.warning(f"Reply key '{reply_key}' not found in replies.json.")
+        return f"Error: Reply key '{reply_key}' not found."
+    # يدور على اللغة المطلوبة
+    message_template = key_obj.get(lang)
     if not message_template:
-        message_template = replies_content.get(reply_key, {}).get("en", f"Error: Reply key '{reply_key}' not found.")
+        # جرب الإنجليزي كـ fallback
+        message_template = key_obj.get("en", f"Error: No message for key '{reply_key}' and lang '{lang}'.")
     try:
         return message_template.format(**kwargs)
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Error formatting message for key '{reply_key}' and lang '{lang}': {e}")
         return message_template
 
+# جلب الردود الثابتة (FAQ) من faq_data.json
 def get_static_reply(user_message: str, lang: str, threshold: int = 75) -> Optional[str]:
     faq_content = _load_json_data(FAQ_DATA_FILE)
     user_message_lower = user_message.lower().strip()
@@ -66,7 +76,7 @@ def get_static_reply(user_message: str, lang: str, threshold: int = 75) -> Optio
                 best_answer = faq_item[answer_key]
     return best_answer
 
-# --- استيراد الدوال من db_helpers لبيانات العميل والمحادثة ---
+# دوال قاعدة البيانات (استخدمها لو عايز تربط بسرعة من أي مكان)
 from utils.db_helpers import (
     get_customer,
     add_or_update_customer,
@@ -78,5 +88,3 @@ def get_user_language(phone_number: str) -> str:
     """استرجاع لغة العميل (من قاعدة البيانات)، يرجع 'en' افتراضي إذا غير موجود."""
     user_obj = get_customer(phone_number)
     return user_obj.language if user_obj and user_obj.language else "en"
-
-# (ممكن تضيف دوال مختصرة لو محتاجها، لكنها مجرد واجهة للدوال الأساسية من db_helpers)
