@@ -1,47 +1,50 @@
-
 {
   "welcome_najdaigent": {
-    "en": "Welcome to NajdAIgent 🤖 Your partner in AI innovation, inspired by Vision 2030.\nTo best assist you, please choose your preferred language:\n1. English\n2. العربية",
-    "ar": "أهلاً وسهلاً بك مع الذكي من NajdAIgent 🤖\nشريكك في ابتكارات الذكاء الاصطناعي، والمستلهم من رؤية 2030.\nلخدمتك بشكل أفضل، يرجى اختيار لغتك المفضلة:\n١. English\n٢. العربية"
+    "en": "Welcome to NajdAIgent 🤖 – Your Saudi partner for smart AI solutions!\nLet's get started. Please select your language:\n1. English\n2. العربية",
+    "ar": "أهلاً بك في NajdAIgent 🤖 – شريكك السعودي لحلول الذكاء الاصطناعي الذكية!\nلنبدأ رحلتنا. يرجى اختيار اللغة:\n١. English\n٢. العربية"
   },
-  "language_selected_en": {
-    "en": "Excellent! You've selected English. Let's proceed.",
-    "ar": "ممتاز! لقد اخترت اللغة الإنجليزية. دعنا نكمل."
-  },
-  "language_selected_ar": {
-    "en": "Excellent! You've selected Arabic. Let's proceed.",
-    "ar": "ممتاز! لقد اخترت اللغة العربية. دعنا نكمل."
+  "language_selected": {
+    "en": "Language changed to English 🇬🇧.\nLet's continue!",
+    "ar": "تم تغيير اللغة إلى العربية 🇸🇦.\nلنواصل!"
   },
   "invalid_language_choice": {
-    "en": "Invalid selection. Please type '1' for English or '2' for العربية to continue. 🔄",
-    "ar": "اختيار غير صحيح. يرجى كتابة '١' للغة الإنجليزية أو '٢' للغة العربية للمتابعة. 🔄"
+    "en": "❌ Invalid choice. Please reply with '1' for English or '2' for العربية.",
+    "ar": "❌ اختيار غير صحيح. يرجى الرد بـ '١' للإنجليزية أو '٢' للعربية."
   },
   "ask_name": {
-    "en": "To personalize your experience, could you please share your name? 😊",
-    "ar": "لتخصيص تجربتك، هل يمكنك مشاركة اسمك الكريم؟ 😊"
+    "en": "Great! What's your name? 😊",
+    "ar": "رائع! ما اسمك الكريم؟ 😊"
   },
   "ask_service_interest": {
-    "en": "A pleasure to meet you, {name}! Which of NajdAIgent's services are you most interested in today? (e.g., AI Analytics, Chatbot Development, AI Consulting)",
-    "ar": "تشرفنا بمعرفتك، {name}! ما هي خدمات NajdAIgent التي تهتم بها اليوم؟ (مثال: تحليلات الذكاء الاصطناعي، تطوير روبوتات المحادثة، استشارات الذكاء الاصطناعي)"
+    "en": "Thanks, {name}! Which service are you interested in today?\nExamples:\n- Smart Chatbots\n- AI Business Tools\n- Data Analytics\n- Custom AI Projects",
+    "ar": "شكرًا، {name}! ما هي الخدمة التي ترغب بها اليوم؟\nمثال:\n- روبوتات محادثة ذكية\n- أدوات ذكاء أعمال\n- تحليلات بيانات\n- مشاريع ذكاء اصطناعي مخصصة"
   },
   "onboarding_complete": {
-    "en": "Thank you, {name}! Your preferences are noted. How can NajdAIgent assist you with your AI goals today? 🚀",
-    "ar": "شكراً لك، {name}! تم تسجيل تفضيلاتك. كيف يمكن لـ NajdAIgent مساعدتك في تحقيق أهدافك في مجال الذكاء الاصطناعي اليوم؟ 🚀"
+    "en": "All set, {name}! 🚀\nYou can now ask any question or request a service. NajdAIgent is here for you.",
+    "ar": "تم الإعداد، {name}! 🚀\nيمكنك الآن طرح أي سؤال أو طلب أي خدمة. NajdAIgent دائمًا معك."
   },
-  "openai_fallback_acknowledge": {
-    "en": "Let me process that with our advanced AI core... 🧠",
-    "ar": "دعني أعالج ذلك باستخدام نواة الذكاء الاصطناعي المتقدمة لدينا... 🧠"
+  "language_change_prompt": {
+    "en": "🌍 You can switch languages anytime.\nReply with:\n1. English\n2. العربية",
+    "ar": "🌍 يمكنك تغيير اللغة في أي وقت.\nالرجاء الرد بـ:\n١. English\n٢. العربية"
   },
-  "error_occurred": {
-    "en": "Apologies, a slight technical hiccup occurred. Could you please try rephrasing or try again in a moment? 🙏",
-    "ar": "نعتذر، حدث خلل فني بسيط. هل يمكنك إعادة صياغة طلبك أو المحاولة مرة أخرى بعد لحظات؟ 🙏"
+  "error_occurred_generic": {
+    "en": "Sorry, something went wrong. Please try again or send your question differently.",
+    "ar": "عذراً، حدث خطأ غير متوقع. حاول مرة أخرى أو أعد صياغة سؤالك."
+  },
+  "default_username": {
+    "en": "Guest",
+    "ar": "ضيف"
   },
   "signature_static": {
-    "en": "\n\nBest regards,\nThe NajdAIgent Team 🤝",
-    "ar": "\n\nمع خالص تحياتنا،\nفريق NajdAIgent 🤝"
+    "en": "\n— NajdAIgent AI Team 🇸🇦",
+    "ar": "\n— فريق NajdAIgent للذكاء الاصطناعي 🇸🇦"
   },
   "signature_openai": {
-    "en": "\n\nThis response was powered by NajdAIgent AI Assistant 🤖",
-    "ar": "\n\nتم تقديم هذه الإجابة بواسطة مساعد NajdAIgent الذكي 🤖"
+    "en": "\n🤖 Generated by NajdAIgent Smart Assistant.",
+    "ar": "\n🤖 تم الرد بواسطة مساعد NajdAIgent الذكي."
+  },
+  "openai_fallback_acknowledge": {
+    "en": "Got it! Let me process your request using our advanced AI engine...",
+    "ar": "تم الاستلام! جاري معالجة طلبك باستخدام تقنيتنا الذكية..."
   }
 }
