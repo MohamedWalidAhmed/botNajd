@@ -10,7 +10,7 @@ from utils.db_helpers import (
     get_conversation,
 )
 from utils.helpers import (
-    detect_language,       # أضف هذه الدالة في helpers لو مش عندك
+    detect_language,
     get_user_language,
     get_reply_from_json,
     get_static_reply,
@@ -39,20 +39,8 @@ def handle_onboarding(phone, msg_body, user_data):
     if onboarding_step == "awaiting_language" or not current_lang:
         detected_lang = detect_language(msg_body)
         add_or_update_customer(phone, language=detected_lang, onboarding_step="awaiting_language_selection")
-        if detected_lang == "ar":
-            welcome = (
-                "أهلاً وسهلاً بك في NajdAIgent! 👋\n"
-                "لو حابب تغير لغة المحادثة في أي وقت، اكتب 'تغيير اللغة'.\n"
-                "يرجى اختيار اللغة:\n"
-                "1. English\n2. العربية"
-            )
-        else:
-            welcome = (
-                "Welcome to NajdAIgent! 👋\n"
-                "If you want to change the conversation language at any time, type 'change language'.\n"
-                "Please choose your preferred language:\n"
-                "1. English\n2. العربية"
-            )
+        # كل رسالة من replies.json
+        welcome = get_reply_from_json("welcome_najdaigent", detected_lang)
         return welcome
 
     # ---- (2) العميل يختار اللغة ---- #
@@ -60,13 +48,13 @@ def handle_onboarding(phone, msg_body, user_data):
         if msg_body.strip() == "1" or "english" in msg_body.lower():
             current_lang = "en"
             add_or_update_customer(phone, language=current_lang, onboarding_step="awaiting_name")
-            confirm_lang = get_reply_from_json("language_selected_en", current_lang)
+            confirm_lang = get_reply_from_json("language_selected", current_lang)
             ask_name = get_reply_from_json("ask_name", current_lang)
             return f"{confirm_lang}\n\n{ask_name}"
         elif msg_body.strip() == "2" or "عربية" in msg_body or "arabic" in msg_body.lower():
             current_lang = "ar"
             add_or_update_customer(phone, language=current_lang, onboarding_step="awaiting_name")
-            confirm_lang = get_reply_from_json("language_selected_ar", current_lang)
+            confirm_lang = get_reply_from_json("language_selected", current_lang)
             ask_name = get_reply_from_json("ask_name", current_lang)
             return f"{confirm_lang}\n\n{ask_name}"
         else:
@@ -145,7 +133,7 @@ def webhook_handler():
                 # --- التعامل مع تغيير اللغة في أي وقت ---
                 if msg_body.strip() in ["تغيير اللغة", "change language"]:
                     add_or_update_customer(from_user_id, onboarding_step="awaiting_language_selection")
-                    msg = "Please choose your preferred language:\n1. English\n2. العربية"
+                    msg = get_reply_from_json("language_change_prompt", get_user_language(from_user_id))
                     ACTIVE_MESSAGE_SENDER(from_user_id, msg)
                     add_message(from_user_id, "assistant", msg)
                     return jsonify({'status': 'language_switch'}), 200
