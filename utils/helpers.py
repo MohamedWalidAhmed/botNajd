@@ -9,6 +9,15 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     logger.setLevel(logging.INFO)
 
+# كشف بسيط حسب كلمات البداية (ممكن تطوره فيما بعد)
+def detect_language(text):
+    if any(word in text for word in ['السلام', 'عليكم', 'مرحبا', 'اهلاً', 'أهلاً', 'عربي']):
+        return "ar"
+    elif any(word in text.lower() for word in ['hello', 'hi', 'english']):
+        return "en"
+    else:
+        return "ar"  # الديفولت عربي
+
 # --- تحديد المسارات (للملفات الثابتة فقط مثل replies, faq) ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DATA_PATH = os.path.join(BASE_DIR, "config_data")
